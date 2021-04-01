@@ -1,0 +1,11 @@
+First complete your exploit locally using the given qemu environment, it comes with symbols etc.
+
+./run.sh -debug
+
+gdb 
+target remote :1234
+file ./vmlinux.bin
+
+Then pwn the remote system by connecting to the service and f.ex. dump your exploit bin via gzip/b64.
+
+NX is ON, KASLR/SMEP/SMAP is OFF!

@@ -1,54 +1,0 @@
-qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'.
-qemu-system-s390x: warning: 'msa5-base' requires 'klmd-sha-512'.
-Linux version 5.3.8 (spujb@desktop) (gcc version 8.3.0 (crosstool-NG 1.24.0)) #11 SMP Fri Nov 29 21:48:18 CET 2019
-setup: Linux is running under KVM in 64-bit mode
-setup: The maximum memory size is 32MB
-cpu: 1 configured CPUs, 0 standby CPUs
-Write protected kernel read-only data: 2680k
-Zone ranges:
-  DMA      [mem 0x0000000000000000-0x000000007fffffff]
-  Normal   empty
-Movable zone start for each node
-Early memory node ranges
-  node   0: [mem 0x0000000000000000-0x0000000001ffffff]
-Initmem setup node 0 [mem 0x0000000000000000-0x0000000001ffffff]
-percpu: Embedded 17 pages/cpu s38656 r0 d30976 u69632
-Built 1 zonelists, mobility grouping on.  Total pages: 8064
-Kernel command line: 
-Dentry cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
-Inode-cache hash table entries: 2048 (order: 2, 16384 bytes, linear)
-mem auto-init: stack:off, heap alloc:off, heap free:off
-Memory: 22800K/32768K available (2204K kernel code, 220K rwdata, 472K rodata, 200K init, 268K bss, 9968K reserved, 0K cma-reserved)
-SLUB: HWalign=256, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
-rcu: Hierarchical RCU implementation.
-rcu: 	RCU restricting CPUs from NR_CPUS=64 to nr_cpu_ids=1.
-rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
-rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
-NR_IRQS: 3, nr_irqs: 3, preallocated irqs: 3
-clocksource: tod: mask: 0xffffffffffffffff max_cycles: 0x3b0a9be803b0a9, max_idle_ns: 1805497147909793 ns
-Console: colour dummy device 80x25
-printk: console [ttyS1] enabled
-pid_max: default: 32768 minimum: 301
-Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
-Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
-rcu: Hierarchical SRCU implementation.
-smp: Bringing up secondary CPUs ...
-smp: Brought up 1 node, 1 CPU
-devtmpfs: initialized
-random: get_random_bytes called from setup_net+0x48/0x1d0 with crng_init=0
-clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
-futex hash table entries: 256 (order: 4, 65536 bytes, linear)
-NET: Registered protocol family 16
-Unpacking initramfs...
-Freeing initrd memory: 2132K
-workingset: timestamp_bits=62 max_order=13 bucket_order=0
-Block layer SCSI generic (bsg) driver version 0.4 loaded (major 254)
-io scheduler mq-deadline registered
-io scheduler kyber registered
-cio: Channel measurement facility initialized using format extended (mode autodetected)
-sclp_sd: Store Data request failed (eq=2, di=3, response=0x40f0, flags=0x00, status=0, rc=-5)
-NET: Registered protocol family 32
-Freeing unused kernel memory: 200K
-Write protected read-only-after-init data: 8k
-Run /init as init process
-

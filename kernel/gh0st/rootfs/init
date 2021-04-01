@@ -1,0 +1,29 @@
+#! /bin/sh
+
+/bin/chown -R root:root /
+/bin/chmod -R 755 /
+/bin/chmod -R 444 /etc/*
+
+/bin/chown -R ctf:root /home/ctf
+/bin/chmod -R 750 /home/ctf
+
+/bin/mount -t proc none /proc
+/bin/mount -t sysfs none /sys
+
+/bin/chown root:root /home/ctf/flag
+/bin/chmod 400 /home/ctf/flag
+
+/bin/mknod /dev/gh0st c 255 0
+/bin/chmod 666 /dev/gh0st
+/bin/chmod 666 /proc/sysrq-trigger 
+/bin/chmod 400 /etc/passwd
+/bin/chmod 400 /init
+/bin/chmod 400 /gh0st.ko
+
+insmod /gh0st.ko
+
+/bin/clear
+/bin/cat /home/ctf/banner
+/bin/echo -e "\n"
+
+cd /home/ctf && /bin/su ctf && /bin/exec /bin/sh
