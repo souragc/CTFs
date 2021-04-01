@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles_login.css')}}">
+{% endblock %}
+{% block extra_js %}
+
+{% endblock %}
+{% block content %}
+<div id ="title" style="text-align: center;position: relative;">
+<h1 style="color:white">Your songs!</h1>
+<p style="color:white">Hello user {{user.username}}</p>
+<p style="color:white">Here is your data:</p>
+<p style="color:white">first_name : {{user.first_name}}</p>
+<p style="color:white">last_name :  {{user.last_name}}</p>
+<p style="color:white">mobile_number :  {{user.mobile_number}}</p>
+<p style="color:white">music_folder :  {{user.music_folder}}</p>
+</div>
+<div class="row">
+{% for song in songs %}
+
+    <div class="col-12 align-self-start" style="">
+        <h3 style="color:white">{{song.name_song}}</h3>
+        <audio controls style="margin-bottom: 5%">
+            <source src="/song/{{song.hash_id}}/download?search_option=hash_id" type="audio/mpeg">
+          Your browser does not support the audio element.
+          </audio>
+    </div>
+{% endfor %}
+</div>
+
+{% endblock %}

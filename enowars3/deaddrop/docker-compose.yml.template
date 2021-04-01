@@ -1,0 +1,20 @@
+version: '2.1'
+services:
+  queue:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    tty: true
+    networks:
+      leetnet:
+        ipv6_address: fd00:1337:TEAMID:ba17::1
+    restart: always
+
+networks:
+  leetnet:
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: fd00:1337:TEAMID:ba17::/64
+          gateway: fd00:1337:TEAMID:ba17::ffff

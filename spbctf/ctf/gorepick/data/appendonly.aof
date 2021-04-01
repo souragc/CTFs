@@ -1,0 +1,333 @@
+*2
+$6
+SELECT
+$1
+0
+*2
+$6
+script
+$5
+flush
+*3
+$6
+script
+$4
+load
+$701
+local username = KEYS[1]
+local name = KEYS[2]
+local info = KEYS[3]
+
+-- we don't need transaction
+-- Redis when execute Lua script use STW
+local exists = redis.pcall('HGET', 'teams:name', name)
+if not exists then
+    -- get the current timestamp to seed random
+    local time = redis.pcall('TIME')
+    math.randomseed(time[1])
+    local rnd = math.random()
+    local join_token = redis.sha1hex(rnd)
+
+    redis.pcall('HSET', 'teams:name', name, name)
+    redis.pcall('HSET', 'teams:join_token', name, join_token)
+    redis.pcall('HSET', 'teams:info', name, info)
+
+    redis.pcall('HSET', 'participants', username, name)
+    return { ok = join_token }
+else
+    return { err = "Team already exists" }
+end
+
+*3
+$6
+script
+$4
+load
+$303
+local username = KEYS[1]
+
+local team = redis.pcall('HGET', 'participants', username)
+if not team then
+    return { username }
+end
+
+local team_info = redis.pcall('HGET', 'teams:info', team)
+local team_token = redis.pcall('HGET', 'teams:join_token', team)
+return { username, team, team_info, team_token }
+
+*3
+$6
+script
+$4
+load
+$618
+local username = KEYS[1]
+local team = KEYS[2]
+local token = KEYS[3]
+
+-- we don't need transaction
+-- Redis when execute Lua script use STW
+local exists = redis.pcall('HGET', 'teams:name', team)
+if not exists then
+    return { err = "Team not found" }
+end
+
+local join_token = redis.pcall('HGET', 'teams:join_token', team)
+if token ~= join_token then
+    return { err = "Access denied. Invalid join token" }
+end
+
+local user_team = redis.pcall('HGET', 'participants', username)
+if user_team == team then
+    return { err = "Already joined" }
+end
+
+redis.pcall("HSET", 'participants', username, team)
+return { ok = "OK" }
+
+
+*3
+$6
+script
+$4
+load
+$286
+local username = KEYS[1]
+
+-- we don't need transaction
+-- Redis when execute Lua script use STW
+local joined = redis.pcall('HGET', 'participants', username)
+if not joined then
+    return { err = "Already leaved" }
+end
+
+redis.pcall('HDEL', 'participants', username)
+return { ok = "OK" }
+
+*3
+$6
+script
+$4
+load
+$281
+local username = KEYS[1]
+local user_token = KEYS[2]
+
+local token = redis.pcall('HGET', 'users', username)
+if not token then
+    return { err = "User not found" }
+end
+
+if token == user_token then
+    return { ok = "OK" }
+else
+    return { err = "Access denied. Invalid token" }
+end
+
+*3
+$6
+script
+$4
+load
+$344
+local username = KEYS[1]
+local password = KEYS[2]
+
+-- we don't need transaction
+-- Redis when execute Lua script use STW
+local exists = redis.pcall('HGET', 'users', username)
+if exists then
+    return { err = "User already exists" }
+end
+
+local token = redis.sha1hex(password)
+redis.pcall('HSET', 'users', username, token)
+return { ok = token }
+
+*1
+$5
+MULTI
+*4
+$4
+HSET
+$5
+users
+$7
+fCiyfFY
+$40
+acb5e584009697159f2ac41b71ba27bbf3268aac
+*1
+$4
+EXEC
+*1
+$5
+MULTI
+*4
+$4
+HSET
+$10
+teams:name
+$48
+[b61e:b5b5:b13f:7ba7:da9a:c55b:733:98ca]ipsam ex
+$48
+[b61e:b5b5:b13f:7ba7:da9a:c55b:733:98ca]ipsam ex
+*4
+$4
+HSET
+$16
+teams:join_token
+$48
+[b61e:b5b5:b13f:7ba7:da9a:c55b:733:98ca]ipsam ex
+$40
+031d690c5725ea88f4de9099c165004f0501d9a9
+*4
+$4
+HSET
+$10
+teams:info
+$48
+[b61e:b5b5:b13f:7ba7:da9a:c55b:733:98ca]ipsam ex
+$55
+Voluptatem consequatur aut perferendis sit accusantium.
+*4
+$4
+HSET
+$12
+participants
+$7
+fCiyfFY
+$48
+[b61e:b5b5:b13f:7ba7:da9a:c55b:733:98ca]ipsam ex
+*1
+$4
+EXEC
+*1
+$5
+MULTI
+*4
+$4
+HSET
+$5
+users
+$7
+mcJAfcm
+$40
+a100fcf5bfa44d8ca97f7293297881ab1b6bce00
+*1
+$4
+EXEC
+*1
+$5
+MULTI
+*4
+$4
+HSET
+$12
+participants
+$7
+mcJAfcm
+$48
+[b61e:b5b5:b13f:7ba7:da9a:c55b:733:98ca]ipsam ex
+*1
+$4
+EXEC
+*1
+$5
+MULTI
+*3
+$4
+HDEL
+$12
+participants
+$7
+fCiyfFY
+*1
+$4
+EXEC
+*1
+$5
+MULTI
+*4
+$4
+HSET
+$5
+users
+$7
+sRTVeCa
+$40
+9fc4eca404c44dfc8d2d807fd55aab329f4df2bc
+*1
+$4
+EXEC
+*1
+$5
+MULTI
+*4
+$4
+HSET
+$10
+teams:name
+$14
+d5ei-pz3l-09eh
+$14
+d5ei-pz3l-09eh
+*4
+$4
+HSET
+$16
+teams:join_token
+$14
+d5ei-pz3l-09eh
+$40
+473ff7cc7038cab4bd444275f5921dd83980c1b0
+*4
+$4
+HSET
+$10
+teams:info
+$14
+d5ei-pz3l-09eh
+$88
+Perferendis voluptatem aut sit accusantium consequatur. FUIMHCUGGCCWTZSWRKF7119F38FF45B=
+*4
+$4
+HSET
+$12
+participants
+$7
+sRTVeCa
+$14
+d5ei-pz3l-09eh
+*1
+$4
+EXEC
+*1
+$5
+MULTI
+*4
+$4
+HSET
+$5
+users
+$7
+UQuqmcC
+$40
+ab111efab40713c75b1821cb15e06e6a1b1b68bf
+*1
+$4
+EXEC
+*1
+$5
+MULTI
+*4
+$4
+HSET
+$12
+participants
+$7
+UQuqmcC
+$14
+d5ei-pz3l-09eh
+*1
+$4
+EXEC

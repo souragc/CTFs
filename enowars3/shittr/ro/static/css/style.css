@@ -1,0 +1,42 @@
+body {
+    background-color: black;
+    color: white;
+    height: 100vh;
+    position: relative;
+}
+
+.shittr {
+    background-color: grey;
+    padding: 0.5em;
+    font-size: 1.5em;
+}
+
+.shit, .alert {
+    word-wrap: anywhere;
+}
+
+.shit .links {
+    border-top: 1px solid #aaa;
+}
+
+.shit .likecnt {
+    float: right;
+}
+
+.shit .content {
+    padding: 1em;
+}
+
+a {
+    color: #999;
+}
+
+a:hover {
+    color: #666;
+}
+
+footer {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}

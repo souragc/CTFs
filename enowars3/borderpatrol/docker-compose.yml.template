@@ -1,0 +1,18 @@
+version: '2.1'
+services:
+  borderpatrol:
+    build: . 
+    volumes:
+            - ./src:/service/
+    networks:
+      borderpatrol_network:
+        ipv6_address: fd00:1337:TEAMID:9999::1
+    restart: unless-stopped
+networks:
+  borderpatrol_network:
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: fd00:1337:TEAMID:9999::/64
+          gateway: fd00:1337:TEAMID:9999::ffff

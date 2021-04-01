@@ -1,0 +1,6 @@
+break *0x0000000000400a14
+
+
+
+
+set exec-wrapper env 'LD_PRELOAD=libc-2.27.so'

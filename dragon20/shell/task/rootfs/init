@@ -1,0 +1,15 @@
+#! /bin/sh
+mount -t devtmpfs dev /dev
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+
+sysctl -w user.max_user_namespaces=0
+ip link set up dev lo
+adduser -D -s /bin/sh -u 1000 user
+
+mount -o remount,ro / 
+
+/bin/server
+setsid /bin/cttyhack login -f user
+
+poweroff -d 1 -n -f

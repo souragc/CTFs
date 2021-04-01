@@ -1,0 +1,5 @@
+break main
+disable $bpnum
+break system
+break execve
+

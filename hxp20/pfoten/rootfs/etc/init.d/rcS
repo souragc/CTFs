@@ -1,0 +1,19 @@
+#!/bin/sh
+
+/bin/busybox --install -s
+
+stty raw -echo
+
+chown -R 0:0 /
+
+mkdir -p /proc && mount -t proc none /proc
+mkdir -p /dev  && mount -t devtmpfs devtmpfs /dev
+mkdir -p /tmp  && mount -t tmpfs tmpfs /tmp
+
+umask 111
+
+dd if=/dev/zero bs=1M count=10 of=/swap status=none
+losetup /dev/loop0 /swap
+mkswap /dev/loop0 >/dev/null
+swapon /dev/loop0 >/dev/null
+

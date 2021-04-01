@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<article>
+	{% if msg %}
+	<h2 class="msg">{{ msg }}</h2>
+	{% else %}
+	<h2><a href="/vote.html?v={{ pollID }}" class="title-link">{{ pollTitle }}</a></h2>
+	<div class="vote-single">
+		<div class="vote-bar">
+			<div class="vote-bar-yes">Yes: {{ votesYes }}</div><div class="vote-bar-no">No: {{ votesNo }}</div>
+		</div>
+		{% if session %}
+			{% if votedYes is none %}
+			<form action="/vote.html?v={{ pollID }}" method="post">
+				<input type="hidden" value="Yes" name="vote">
+				<input type="submit" value="Yes" class="vote-button vote-yes">
+			</form>
+			<form action="/vote.html?v={{ pollID }}" method="post">
+				<input type="hidden" value="No" name="vote">
+				<input type="submit" value="No" class="vote-button vote-no">
+			</form>
+			{% elif votedYes %}
+			<div class="voted-yes">You voted: Yes</div>
+			{% else %}
+			<div class="voted-no">You voted: No</div>
+			{% endif %}
+		{% else %}
+			<div class="voted-none"><a href="/login.html" class="link">Login</a> or <a href="/register.html" class="link">Register</a> to start voting.</div>
+		{% endif %}
+	</div>
+	<p>Vote created by: {{ pollCreator }}</p>
+	<h3>Description</h3>
+	<p>{{ pollDescription }}</p>
+	{% if session[2] == pollCreator and pollCreatorsNotes|length > 0 %}
+	<h3>Your private notes</h3>
+	<p>{{ pollCreatorsNotes }}</p>
+	{% endif %}
+	{% endif %}
+</article>
+{% endblock %}

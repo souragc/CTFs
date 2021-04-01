@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Telescopy</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mt-4">
+            <div class="col-md-7">
+                <h5>Add Planet</h5>
+                <input id="name" type="text" placeholder="Name" class="form-control">
+                <input id="declination" type="text" placeholder="Declination" class="form-control">
+                <input id="rightAscension" type="text" placeholder="Right Ascension" class="form-control">
+                <input id="flag" type="text" placeholder="Flag" class="form-control">
+                <br>
+                <button class="btn btn-secondary" id=" submit2" onClick="addPlanet(this.id)">Add Planet</button>
+            </div>
+            <div class="mt-3 col-md-7">
+                <h5>Get Planet </h5>
+                <input id="ticket" type="text" placeholder="Ticket" class="form-control">
+                <input id="planetId" type="text" placeholder="id" class="form-control">
+                <br>
+                <button class="btn btn-secondary" id=" submit1" onClick="getPlanet(this.id)">Detect</button>
+                <p id="result"></p>
+            </div>
+        </div>
+        <div class="col-md-6 mt-4">
+            <div class="list-group" style="overflow-y: scroll; height:600px;">
+                {% for planet in planets %}
+                    <a href="/planet_details?name={{ planet.name }}" class="list-group-item list-group-item-action">Name: {{ planet.name }}</a>
+                {% endfor %}
+            </div>
+            <a class="btn btn-secondary mt-3" href="/" role="button">Update Planet List</a>
+        </div>
+    </div>
+</div>
+<script src="/static/js/script.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+</html>

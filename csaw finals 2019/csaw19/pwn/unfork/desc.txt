@@ -1,0 +1,22 @@
+k - uncreate a child process
+
+SYNOPSIS
+    void unfork(void);
+
+DESCRIPTION
+    unfork() undoes the operation performed by fork(2).
+
+RETURN VALUE
+    unfork() does not return a value.
+
+ATTRIBUTES
+    TODO: thread-safety table
+
+CONFORMING TO
+    This call is specific to Linux on CSAW systems, and should not be used in programs intended to be portable. It was introduced in Linux Kernel version 5.3.
+
+BUGS
+    Nobody knows precisely what unfork() does; avoid it in portable programs. Or avoid it altogether: use exit(2) instead, if that is what you mean. Do not use unfork().
+
+AUTHOR
+    Written by Nick Gregory (@kallsyms, @capsule8) and Josh Hofing (@hyperosonic, @trailofbits).

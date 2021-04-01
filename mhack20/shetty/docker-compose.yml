@@ -1,0 +1,13 @@
+version: "3.3"
+services:
+  saas:
+    image: saas
+    build: . 
+    ports:
+      - "1337:1337"
+    volumes:
+      - "storage:/opt/saas/storage"
+
+volumes:
+  storage:
+

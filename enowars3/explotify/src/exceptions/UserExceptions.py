@@ -1,0 +1,2 @@
+class CreateUserExcepiton(Exception):
+    pass

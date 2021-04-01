@@ -1,0 +1,5 @@
+casino/assets/aes.seed
+.gitignore
+casino/cryptomat/.aeskey.json
+casino/cryptomat/.aeskey_enc.json
+.dockerignore

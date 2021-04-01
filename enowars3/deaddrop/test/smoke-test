@@ -1,0 +1,75 @@
+#! /bin/sh -
+
+set -eu
+
+clean_up() {
+    set +eu
+    ${service_cmd} stop >/dev/null
+    rm -f -- "${topics_file_path}"
+}
+
+print_result() {
+    test_num="${1}"
+    description="${2}"
+    return_code="${3}"
+
+    if [ "${return_code}" = "0" ]
+    then
+        printf -- 'ok %d - %s\n' "${test_num}" "${description}"
+    else
+        printf -- 'not ok %d - %s\n' "${test_num}" "${description}"
+    fi
+}
+
+port="8080"
+http="http://"
+ws="ws://"
+hostname="127.0.0.1"
+add_topic_endpoint="/add_topic"
+topic_endpoint="/topics"
+subscribe_endpoint="/subscribe"
+root_dir="_rel/deaddrop_release"
+topics_file_path="${root_dir}/topics.txt"
+service_cmd="${root_dir}/bin/deaddrop_release"
+
+trap 'clean_up' EXIT
+
+${service_cmd} start
+test_num=0
+
+test_num="0"
+
+
+curl --data "public" --header "Content-Type: application/x-www-form-urlencoded" --include --request PATCH --silent "${http}${hostname}:${port}${add_topic_endpoint}" | head -n 1 | grep '^HTTP.*200 OK' >/dev/null
+print_result "$((test_num+=1))" "Add public topic" "${?}"
+
+curl --data "- private" --header "Content-Type: application/x-www-form-urlencoded" --include --request PATCH --silent "${http}${hostname}:${port}${add_topic_endpoint}" | head -n 1 | grep '^HTTP.*200 OK' >/dev/null
+print_result "$((test_num+=1))" "Add private topic" "${?}"
+
+response="$(curl --include --request GET --silent "${http}${hostname}:${port}${topic_endpoint}")"
+return_code="${?}"
+if [ "${return_code}" = 0 ]
+then
+    if printf -- '%s' "${response}" | head -n 1 | grep -- '^HTTP.*200 OK' >/dev/null && \
+       printf -- '%s' "${response}" | grep -- '^+ public' >/dev/null && \
+       ! printf -- '%s' "${response}" | grep -- 'private' >/dev/null
+    then
+        return_code="0"
+    else
+        return_code="1"
+    fi
+fi
+print_result "$((test_num+=1))" "List topics" "${return_code}"
+
+response="$(printf '%s\n' "SUBSCRIBE: public" | websocat "${ws}${hostname}:${port}${subscribe_endpoint}")"
+return_code="${?}"
+if [ "${return_code}" = 0 ]
+then
+    if printf -- '%s' "${response}" | grep -- 'Subscribed.' >/dev/null
+    then
+        return_code="0"
+    else
+        return_code="1"
+    fi
+fi
+print_result "$((test_num+=1))" "Subscribe" "${return_code}"

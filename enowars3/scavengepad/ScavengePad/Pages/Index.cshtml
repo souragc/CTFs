@@ -1,0 +1,228 @@
+﻿@page
+@model ScavengePad.Pages.IndexModel
+@using ScavengePad.Models
+@using ScavengePad.Models.Database
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">-->
+    <title>@Environment.GetEnvironmentVariable("SCAVENGEPAD_INSTANCE_NAME") ScavengePad</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" type="text/css">
+    <style>
+        body, html {
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column">
+    <nav id="scavengepadNavbar" class="navbar navbar-light bg-light">
+        <span class="navbar-brand mb-0 h1">@Environment.GetEnvironmentVariable("SCAVENGEPAD_INSTANCE_NAME")</span>
+        <div class="ml-auto"></div>
+        <a class="nav-link" v-if="!loggedin" href="" onclick="displayLogin(); return false;">Login</a>
+        <a class="nav-link" href="" v-if="!loggedin" onclick="displayRegistration(); return false;">Register</a>
+        <div class="nav-item dropdown" v-if="loggedin">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                no operation chosen
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <template v-for="operation in operations">
+                    <a href="#" class="dropdown-item" v-on:click="selectOperation(operation)">{{ operation.Title }}</a>
+                </template>
+                <hr />
+            </div>
+        </div>
+        <div class="nav-item fa fa-plus" data-toggle="modal" data-target="#modifyOperationModal" data-new-objective="true"></div>
+    </nav>
+
+    <main id="mainContainer" role="main" class="d-none row m-2 d-flex flex-fill">
+        <div id="loginContainer" class="container d-none">
+            <h1>Scavenge Operations Coordination Service</h1>
+            <h3>Login</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="loginFormUsername" placeholder="Username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="loginFormPassword" placeholder="Password" autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+
+        <div id="registrationContainer" class="container d-none">
+            <h1>Scavenge Operations Coordination Service</h1>
+            <h3>Registration</h3>
+            <form id="registrationForm">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="registrationFormUsername" placeholder="Username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="registrationFormPassword" placeholder="Password" autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="registrationFormAuthkey" placeholder="Authkey" autocomplete="authkey">
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+
+        <div id="scavengepadContainer" role="main" class="d-none row m-2 w-100">
+            <div id="selectedOperationContainer" class="col col-3">
+                <div class="card p-2">
+                    <div class="highlightable">
+                        <a hclass="contentlink">{{ operation.Title }}</a>
+                        <span class="pull-right">
+                            <a href="" class="contentlink" v-on:click="_openOperationFiles(objective, $event)"><i class="fa fa-folder"></i></a>
+                            <sup>{{ operation.Files.length }}</sup>
+                        </span>
+                    </div>
+                    <div class="progress m-2">
+                        <div class="progress-bar" role="progressbar" :style="`width: ${solvedObjectives*100/totalObjectives}%;`" aria-valuemin="0" :aria-valuemax="`${totalObjectives}`">{{solvedObjectives}} / {{totalObjectives}}</div>
+                    </div>
+                    <div class="progress m-2">
+                        <div class="progress-bar" role="progressbar" :style="`width: ${archievedPoints*100/totalPoints}%;`" aria-valuemin="0" :aria-valuemax="`${totalPoints}`">{{archievedPoints}} / {{totalPoints}}</div>
+                    </div>
+                </div>
+
+                <div id="operationObjectives" class="card mt-4 p-2">
+                    <table>
+                        <template v-for="category, categoryName in operation.Categories">
+                            <tr>
+                                <td colspan="5"><strong>{{ categoryName }} [<span class="done-count">0</span>/42]</strong></td>
+                            </tr>
+                            <template v-for="objective in category">
+                                <tr class="objective done highlightable">
+                                    <td class="padded"><input type="checkbox" @@change="sendOperationUpdate" :data-chalid="objective.Id" v-model="objective.Solved" autocomplete="off"></td>
+                                    <td class="padded" width="100%">
+                                        <a href="" v-on:click="_selectObjective(objective, $event)" class="contentlink">[{{objective.Points}}] {{objective.Title}}</a>
+                                    </td>
+                                    <td class="padded" nowrap>
+                                        <a href="" class="contentlink" v-on:click="_openObjectiveFiles(objective, $event)"><i class="fa fa-folder"></i></a>
+                                        <sup>{{ objective.Files.length }}</sup>
+                                    </td>
+                                    <td nowrap>
+                                        <a data-toggle="popover" data-placement="right" data-trigger="manual" class="assignments" :data-title="objective.Title"><i class="fa fa-user"></i></a>
+                                        <sup class="assignment-count" :data-chalid="objective.Id">0</sup>
+                                        <div style="display:none" class="popover-content">
+                                            <div align="center" style="margin-bottom:10px">
+                                                <button class="btn btn-mini btn-assign" :data-chalid="objective.Id">assign</button>
+                                            </div>
+                                            <ul class="unstyled labels" :data-chalid="objective.Id"></ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
+                        <tr>
+                            <td colspan="5">
+                                <button type="button" class="btn btn-mini" data-toggle="modal" data-target="#modifyOperationModal">edit</button>
+                                <button type="button" class="btn btn-mini" data-toggle="button">hide finished</button>
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="padContainer" class="col col-9"></div>
+            <div id="noOperationChosenContainer" class="col col-3">No operation selected</div>
+            <div id="filesContainer" class="col col-9 d-none">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <th>User</th>
+                            <th>Mime Type</th>
+                            <th>Uploaded</th>
+                            <th>Actions</th>
+                        </tr>
+                        <template v-for="file in fileList">
+                            <tr>
+                                <td><a :href="`/uploads/${file.Id}`">{{file.Name}}</a></td>
+                                <td>asdf</td>
+                                <td>{{file.MimeType}}</td>
+                                <td><abbr class="timeago" title="uploaded">{{file.Timestamp}}</abbr></td>
+                                <td>
+                                    <a href="/file/id/name"><i class="icon-download-alt"></i></a>
+                                    <a class="deletefile" href="#" data-id="id" data-name="name"><i class="icon-trash"></i></a>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <form id="objectiveFileUploadForm" enctype="multipart/form-data">
+                    <input type="file" name="files" multiple>
+                    <button>Upload</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="welcomeContainer" class="container">
+            <h4>Welcome to ScavengePad!</h4>
+            <i>If you want to use this pad in the real world, please wait until I have pushed a version without intended security issues to <a href="https://github.com/enowars/ChallengePad">github</a>!</i>
+            <br />
+            <br />
+            Coordinate your scavenging operations with ease! Track all locations which might contain valueable resources and your teams' progress!
+            <br />
+            <br />
+            Some evil hacker has claimed that ScavengePad contains 4 disctinct security issues which all lead to loss of personal information. All of those accurations are completely made up, all your data is completely safe with us.
+        </div>
+    </main>
+
+    <div id="modifyOperationModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="modifyOperationForm" autocomplete="off">
+                        <input id="modifyOperationFormName" class="form-control" type="text" placeholder="Name" v-model="operation.Title">
+                        <hr />
+                        <div>
+                            <template v-for="objective in operation.Objectives">
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <input class="form-control" type="text" placeholder="Objective" v-model="objective.Title">
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" type="text" placeholder="Category" v-model="objective.Category">
+                                    </div>
+                                    <div class="col-3">
+                                        <input class="form-control center-block" type="number" placeholder="0" v-model="objective.Points">
+                                    </div>
+                                    <div class="col-1">
+                                        <a href="" class="fa fa-plus" onclick="addDefaultObjectiveToModifyModal(); return false;"></a>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="handleModifyOperationModalClosed()" data-dismiss="modal">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="/js/scavengepad.js"></script>
+    <script>
+        init();
+        initOperation();
+    </script>
+</body>
+</html>

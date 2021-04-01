@@ -1,0 +1,26 @@
+version: "2.2"
+services:
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./app/www:/usr/share/nginx/html/
+    depends_on:
+      - gunicorn
+    networks:
+        voting_network:
+            ipv6_address: fd00:1337:TEAMID:f07e::1
+  gunicorn:
+    build: ./gunicorn
+    volumes:
+      - ./app:/app
+    networks:
+        voting_network:
+            ipv6_address: fd00:1337:TEAMID:f07e::2
+networks:
+  voting_network:
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: fd00:1337:TEAMID:f07e::/64
+          gateway: fd00:1337:TEAMID:f07e::ffff

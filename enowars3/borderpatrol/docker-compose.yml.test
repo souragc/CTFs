@@ -1,0 +1,13 @@
+version: '2.1'
+services:
+  borderpatrol:
+    build: . 
+    volumes:
+            - ./src:/service/
+    networks:
+      checkernet:
+        ipv6_address: fd00:1337:0:cecc::1
+    restart: unless-stopped
+networks:
+    checkernet:
+        external: true

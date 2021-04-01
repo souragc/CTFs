@@ -1,0 +1,2 @@
+My friend give me a file with some table inside, and I can't understand it. Let's find out what it is.
+Password: sha1{<secret>}

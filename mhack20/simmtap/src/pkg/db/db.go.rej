@@ -1,0 +1,13 @@
+--- src/pkg/db/db.go
++++ src/pkg/db/db.go.new
+@@ -70,10 +70,6 @@
+     if err != nil {
+         return err
+     }
+-    err = createUniqueIndexes(ctx, db.tokens, []string{"token"})
+-    if err != nil {
+-        return err
+-    }
+     err = createIndexes(ctx, db.tokens, []string{"user"})
+     if err != nil {
+         return err

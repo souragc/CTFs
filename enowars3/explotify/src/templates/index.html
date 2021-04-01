@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles_login.css')}}">
+{% endblock %}
+{% block extra_js %}
+<script type="text/javascript" src="{{ url_for('static', filename='upload_logic.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center h-100">
+    <div class="card bigger_card">
+        <div class="card-header">
+            <h3>Generate Song</h3>
+
+        </div>
+        <div class="card-body">
+            <form method="POST" action="register">
+                <div class="input-group form-group">
+                        <input type="text" id="name_song" name="name_song" class="form-control"
+                        placeholder="Name for the song">
+                </div>
+                <div class="input-group form-group">
+                    <textarea class="form-control" name="lyrics" id="lyrics" placeholder="Here your lyrics"></textarea>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="false" id="checkbox_file"
+                        onclick="checkCustomMusic()">
+                    <label class="form-check-label white_text" for="checkbox_file">
+                        Lyrics with custom music
+                    </label>
+                </div>
+                <div class="input-group form-group hidden" id="custom_file_input">
+                    <input type="file" name="custom_song" id="custom_song" class="form-control"
+                        placeholder="Custom song">
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="false" onclick="checkWebsiteLyrics()"
+                        id="checkbox_lyrics">
+                    <label class="form-check-label white_text" for="checkbox_lyrics">
+                        No inspiration? Lyrics from website
+                    </label>
+                </div>
+
+                <div class="input-group form-group hidden" id="custom_lyrics">
+                    <input type="text" id="custom_lyrics_field" name="custom_lyrics_field" class="form-control"
+                        placeholder="Here website link">
+                </div>
+
+                <div class="form-group button_container">
+                    <input type="button" style="margin-bottom: 20%" onclick="requestCreateSong()"
+                        value="Create new Song" class="btn float-right login_btn">
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+
+            <div class="d-flex justify-content-center links">
+                Your Created Songs: <a style="color: white" href="/song">My songs</a>
+            </div>
+            <div class="d-flex justify-content-center links">
+                {% if info is not none and "error_description" in info %}
+                Error happend: {{info["error_description"] }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card-footer hidden" id="web_lyrics_info" style="margin-top: 20%">
+
+            <h4 style="color:white">Your lyrics were created from this text</h4>
+            <div class="d-flex justify-content-center links">
+
+                <textarea id="web_lyrics_created">
+
+                            </textarea>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div clas="loader-txt">
+                    The AI is creating you wondeful song!!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "ScavengePad": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DATABASE_DOMAIN": "localhost",
+        "CODI_DOMAIN": "localhost",
+        "REDIS_DOMAIN": "localhost",
+        "SCAVENGEPAD_INSTANCE_NAME": "ENOFLAG",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://0.0.0.0"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}"
+    }
+  }
+}

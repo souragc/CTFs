@@ -1,0 +1,28 @@
+version: '2.4'
+services:
+  gorepick:
+    build: .
+    ports:
+      - 2020:2020
+    restart: always
+    environment:
+      - LISTEN=:2020
+      - REDIS_ADDR=redis:6379
+    pids_limit: 100
+    cpu_percent: 50
+    mem_limit: 256M
+    volumes:
+      - ./storage/scripts:/storage/scripts
+    depends_on:
+      - redis
+
+  redis:
+    image: redis
+    pids_limit: 100
+    cpu_percent: 50
+    mem_limit: 256M
+    volumes:
+      - ./data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+

@@ -1,0 +1,52 @@
+version: '2.4'
+
+services:
+  scavengepad:
+    build:
+      context: .
+      dockerfile: ScavengePad/Dockerfile
+    environment:
+      - DATABASE_DOMAIN=postgres
+    depends_on:
+      - postgres
+    networks:
+      scavengepad_network:
+        ipv6_address: fd00:1337:TEAMID:cccc::1
+      scavengepad_intern:
+  codimd:
+    image: hackmdio/hackmd:1.2.1
+    environment:
+      - CMD_DB_URL=postgres://docker:docker@codimdpostgres:5432/hackmd
+      - CMD_ALLOW_FREEURL=true
+    depends_on:
+      - codimdpostgres
+    networks:
+      scavengepad_intern:
+  codimdpostgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: hackmd
+    networks:
+      scavengepad_intern:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+    networks:
+      scavengepad_intern:
+  redis:
+    image: redis
+    networks:
+      scavengepad_intern:
+networks:
+  scavengepad_intern:
+  scavengepad_network:
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: fd00:1337:TEAMID:cccc::/64
+          gateway: fd00:1337:TEAMID:cccc::ffff

@@ -1,0 +1,7 @@
+flask==1.0.2
+cryptography
+paramiko
+flask-sqlalchemy
+flask-cors
+passlib
+redis

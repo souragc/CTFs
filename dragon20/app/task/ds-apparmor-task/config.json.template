@@ -1,0 +1,10 @@
+{
+    "auths": {
+        "registry.gitlab.com": {
+            "auth": "$$CREDENTAILS$$"
+        }
+    },
+    "HttpHeaders": {
+        "User-Agent": "Docker-Client/18.09.7 (linux)"
+    }
+}

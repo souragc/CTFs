@@ -1,0 +1,30 @@
+version: '2.3'
+
+services:
+  telescopy-service:
+    build: ./src
+    volumes:
+      - ./src:/app
+    depends_on:
+      - redis
+    environment:
+      - "LISTEN_PORT=[::]:80"
+    networks:
+     default:
+     telescopy_network:
+       ipv6_address: fd00:1337:TEAMID:abed::1
+    restart: unless-stopped
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+
+networks:
+ telescopy_network:
+   enable_ipv6: true
+   ipam:
+     driver: default
+     config:
+       - subnet: fd00:1337:TEAMID:abed::/64
+         gateway: fd00:1337:TEAMID:abed::ffff

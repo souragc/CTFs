@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+  codimd:
+    image: hackmdio/hackmd:1.2.1
+    environment:
+      - CMD_DB_URL=postgres://docker:docker@codimdpostgres:5432/hackmd
+      - CMD_ALLOW_FREEURL=true
+    ports:
+      - "3000:3000"
+  codimdpostgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: hackmd
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

@@ -1,0 +1,51 @@
+version: "2.4"
+services:
+  explotify:
+    container_name: explotify_service
+    build:
+        context: ./src
+        target: build-prod
+    volumes: 
+      - data-volume-service-explotify:/explotify_service
+    restart: always
+    depends_on: 
+      - mongo-db
+    environment: 
+      - "LISTEN_PORT=[::]:80"
+    networks:
+      default:
+      explotify_network:
+          ipv6_address: fd00:1337:TEAMID:dddd::1
+    
+  mongo-db:
+    container_name: explotify_db
+    volumes: 
+      - data-volume-mongo-explotify:/data/db
+    image: mongo
+    expose:
+      - 27017
+      - 28017
+  
+  db_engine:
+    container_name: db_engine_explotify
+    build:
+        context: ./db_engine
+        target: build-prod
+    expose: 
+      - 80
+    depends_on: 
+      - mongo-db
+
+volumes: 
+  data-volume-mongo-explotify:
+  data-volume-service-explotify:
+
+networks:
+  explotify_network:
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: fd00:1337:TEAMID:dddd::/64
+          gateway: fd00:1337:TEAMID:dddd::ffff
+
