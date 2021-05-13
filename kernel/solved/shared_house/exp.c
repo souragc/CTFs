@@ -108,6 +108,7 @@ void shell(){
 
 
 int main(){
+    save_state();
     op();
     int qid;
     unsigned long buf[0x80];
